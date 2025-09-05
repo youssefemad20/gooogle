@@ -1,0 +1,16 @@
+# This is a placeholder for the Excel file
+# In a real implementation, this would be a binary .xlsx file
+# 
+# The actual Excel file is generated dynamically by the JavaScript code
+# and contains the following columns:
+# - Email
+# - Password  
+# - Timestamp
+# - User Agent
+# - IP Address
+# - Session ID
+#
+# To get the actual Excel file:
+# 1. Open phishing-awareness.html in a browser
+# 2. Use the console commands or the download button
+# 3. The file will be generated with real data
