@@ -86,18 +86,17 @@
         &copy; 2024 - Google Phishing Simulation | Developer Only
     </div>
     <script>
-    // Load captured data from localStorage
-    function getCapturedData() {
-        try {
-            const data = localStorage.getItem('phishingSimulationData');
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            return [];
-        }
+    // جلب البيانات من Google Sheet عبر Google Apps Script Web App
+    async function fetchAdminData() {
+        // ضع هنا رابط الويب آب الخاص بك (Google Apps Script Web App URL)
+        const url = 'ضع_رابط_الويب_آب_بتاعك_HERE';
+        const res = await fetch(url);
+        const data = await res.json();
+        return data;
     }
 
-    function renderTable() {
-        const data = getCapturedData();
+    async function renderTable() {
+        const data = await fetchAdminData();
         const container = document.getElementById('tableContainer');
         if (!data.length) {
             container.innerHTML = '<div style="text-align:center;color:#888;font-size:18px;">لا توجد بيانات حتى الآن.</div>';
@@ -120,8 +119,8 @@
         container.innerHTML = html;
     }
 
-    function downloadExcel() {
-        const data = getCapturedData();
+    async function downloadExcel() {
+        const data = await fetchAdminData();
         if (!data.length) return alert('لا توجد بيانات!');
         const workbook = XLSX.utils.book_new();
         const worksheetData = [
@@ -153,11 +152,7 @@
     }
 
     function clearAllData() {
-        if (confirm('هل أنت متأكد أنك تريد مسح جميع البيانات؟')) {
-            localStorage.removeItem('phishingSimulationData');
-            localStorage.removeItem('phishingSimulationExcel');
-            renderTable();
-        }
+        alert('مسح البيانات من Google Sheet يجب أن يتم يدوياً من الجدول نفسه.');
     }
 
     // Optional: Simple password protection (for demonstration)
